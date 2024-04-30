@@ -1,4 +1,6 @@
 const std = @import("std");
+const mem = std.mem;
+const ArrayList = std.ArrayList;
 
 pub const TokenType = enum {
     ILLEGAL,
@@ -9,6 +11,14 @@ pub const TokenType = enum {
     // Operators
     ASSIGN,
     PLUS,
+    MINUS,
+    BANG,
+    ASTERISK,
+    SLASH,
+    LT,
+    GT,
+    EQ,
+    NOT_EQ,
     // Delimiters
     COMMA,
     SEMICOLON,
@@ -19,16 +29,27 @@ pub const TokenType = enum {
     // Keywords
     FUNCTION,
     LET,
+    TRUE,
+    FALSE,
+    IF,
+    ELSE,
+    RETURN,
 };
 
 pub const Token = struct {
+    allocator: mem.Allocator,
     token_type: TokenType,
     literal: []const u8,
 
-    pub fn init(token_type: TokenType, literal: []const u8) @This() {
+    pub fn init(allocator: mem.Allocator, token_type: TokenType, literal: []const u8) !@This() {
         return @This(){
+            .allocator = allocator,
             .token_type = token_type,
-            .literal = literal,
+            .literal = try allocator.dupe(u8, literal),
         };
+    }
+
+    pub fn deinit(self: *@This()) void {
+        self.allocator.free(self.literal);
     }
 };
