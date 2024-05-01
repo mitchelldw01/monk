@@ -15,6 +15,8 @@ pub const Lexer = struct {
     position: usize,
     read_position: usize,
     curr_byte: u8,
+    row: usize,
+    col: usize,
 
     pub fn init(allocator: mem.Allocator, input: []const u8) @This() {
         var lexer = @This(){
@@ -23,6 +25,8 @@ pub const Lexer = struct {
             .position = 0,
             .read_position = 0,
             .curr_byte = 0,
+            .row = 1,
+            .col = 1,
         };
         lexer.readChar();
         return lexer;
@@ -80,6 +84,11 @@ pub const Lexer = struct {
 
     fn skipWhitespace(self: *@This()) void {
         while (ascii.isWhitespace(self.curr_byte)) {
+            if (self.curr_byte == '\n') {
+                self.row += 1;
+                self.col = 0;
+            }
+
             self.readChar();
         }
     }
@@ -93,6 +102,7 @@ pub const Lexer = struct {
 
         self.position = self.read_position;
         self.read_position += 1;
+        self.col += 1;
     }
 
     fn readIdentifier(self: *@This()) []const u8 {
