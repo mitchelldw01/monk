@@ -9,7 +9,7 @@ const TokenType = token.TokenType;
 
 const keywords = @import("keywords.zig");
 
-const Lexer = struct {
+pub const Lexer = struct {
     allocator: std.mem.Allocator,
     input: []const u8,
     position: usize,
@@ -112,7 +112,6 @@ const Lexer = struct {
     }
 
     fn peekChar(self: *@This()) u8 {
-        if (self.read_position > self.input.len) {
         if (self.read_position >= self.input.len) {
             return 0;
         }

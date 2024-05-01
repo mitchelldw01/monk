@@ -52,4 +52,10 @@ pub const Token = struct {
     pub fn deinit(self: *@This()) void {
         self.allocator.free(self.literal);
     }
+
+    pub fn format(self: @This(), comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
+        _ = fmt;
+        _ = options;
+        try writer.print("{} {s}\n", .{ self.token_type, self.literal });
+    }
 };

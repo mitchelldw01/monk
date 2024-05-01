@@ -65,4 +65,26 @@ pub fn build(b: *std.Build) void {
     // running the unit tests.
     const test_step = b.step("test", "Run unit tests");
     test_step.dependOn(&run_exe_unit_tests.step);
+
+    // Add custom modules to main and test executables.
+    const lexer_mod = b.createModule(.{
+        .root_source_file = .{ .path = "src/lexer/lexer.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+
+    exe.root_module.addImport("lexer", lexer_mod);
+    exe_unit_tests.root_module.addImport("lexer", lexer_mod);
+
+    const repl_mod = b.createModule(.{
+        .root_source_file = .{ .path = "src/repl/repl.zig" },
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "lexer", .module = lexer_mod },
+        },
+    });
+
+    exe.root_module.addImport("repl", repl_mod);
+    exe_unit_tests.root_module.addImport("repl", repl_mod);
 }
