@@ -41,19 +41,19 @@ pub const Token = struct {
     token_type: TokenType,
     literal: []const u8,
 
-    pub fn init(allocator: mem.Allocator, token_type: TokenType, literal: []const u8) !@This() {
-        return @This(){
+    pub fn init(allocator: mem.Allocator, token_type: TokenType, literal: []const u8) !Token {
+        return Token{
             .allocator = allocator,
             .token_type = token_type,
             .literal = try allocator.dupe(u8, literal),
         };
     }
 
-    pub fn deinit(self: *@This()) void {
+    pub fn deinit(self: *Token) void {
         self.allocator.free(self.literal);
     }
 
-    pub fn format(self: @This(), comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
+    pub fn format(self: Token, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
         _ = fmt;
         _ = options;
         try writer.print("{} {s}\n", .{ self.token_type, self.literal });

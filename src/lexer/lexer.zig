@@ -18,8 +18,8 @@ pub const Lexer = struct {
     row: usize,
     col: usize,
 
-    pub fn init(allocator: mem.Allocator, input: []const u8) @This() {
-        var lexer = @This(){
+    pub fn init(allocator: mem.Allocator, input: []const u8) Lexer {
+        var lexer = Lexer{
             .allocator = allocator,
             .input = input,
             .position = 0,
@@ -32,7 +32,7 @@ pub const Lexer = struct {
         return lexer;
     }
 
-    pub fn nextToken(self: *@This()) !Token {
+    pub fn nextToken(self: *Lexer) !Token {
         self.skipWhitespace();
 
         const curr_bytes = &[_]u8{self.curr_byte};
@@ -82,7 +82,7 @@ pub const Lexer = struct {
         return tok;
     }
 
-    fn skipWhitespace(self: *@This()) void {
+    fn skipWhitespace(self: *Lexer) void {
         while (ascii.isWhitespace(self.curr_byte)) {
             if (self.curr_byte == '\n') {
                 self.row += 1;
@@ -93,7 +93,7 @@ pub const Lexer = struct {
         }
     }
 
-    fn readChar(self: *@This()) void {
+    fn readChar(self: *Lexer) void {
         if (self.read_position >= self.input.len) {
             self.curr_byte = 0;
         } else {
@@ -105,7 +105,7 @@ pub const Lexer = struct {
         self.col += 1;
     }
 
-    fn readIdentifier(self: *@This()) []const u8 {
+    fn readIdentifier(self: *Lexer) []const u8 {
         const position = self.position;
         while (isIdentifierByte(self.curr_byte)) {
             self.readChar();
@@ -113,7 +113,7 @@ pub const Lexer = struct {
         return self.input[position..self.position];
     }
 
-    fn readNumber(self: *@This()) []const u8 {
+    fn readNumber(self: *Lexer) []const u8 {
         const position = self.position;
         while (ascii.isDigit(self.curr_byte)) {
             self.readChar();
@@ -121,14 +121,14 @@ pub const Lexer = struct {
         return self.input[position..self.position];
     }
 
-    fn peekChar(self: *@This()) u8 {
+    fn peekChar(self: *Lexer) u8 {
         if (self.read_position >= self.input.len) {
             return 0;
         }
         return self.input[self.read_position];
     }
 
-    fn makeTwoCharToken(self: *@This(), token_type: TokenType) !Token {
+    fn makeTwoCharToken(self: *Lexer, token_type: TokenType) !Token {
         const curr_byte = self.curr_byte;
         self.readChar();
         const tok_bytes = &[_]u8{ curr_byte, self.curr_byte };
