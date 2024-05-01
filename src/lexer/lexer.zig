@@ -113,6 +113,7 @@ const Lexer = struct {
 
     fn peekChar(self: *@This()) u8 {
         if (self.read_position > self.input.len) {
+        if (self.read_position >= self.input.len) {
             return 0;
         }
         return self.input[self.read_position];
